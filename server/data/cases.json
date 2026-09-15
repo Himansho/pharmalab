@@ -1,0 +1,181 @@
+{
+  "_meta": {
+    "note": "All cases are FICTIONAL teaching scenarios. No real patient data. Model answers cite FDA label sections retrieved via openFDA. Educational use only — not medical advice.",
+    "updated": "2026-09"
+  },
+  "cases": [
+    {
+      "id": "statin-macrolide",
+      "title": "Muscle pain after a new antibiotic",
+      "difficulty": "Intermediate",
+      "persona": "Community pharmacy — adverse drug reaction triage",
+      "age": 65,
+      "sex": "Male",
+      "presentation": "Presents with 2 weeks of progressive, symmetric thigh and shoulder pain, marked weakness, and dark 'cola-colored' urine. No trauma, no new exercise. History: hyperlipidemia, hypertension. Started clarithromycin 500 mg BID 4 weeks ago for a dental infection.",
+      "vitals": { "BP": "138/84", "HR": "96", "Temp": "37.1°C", "RR": "18" },
+      "labs": [
+        { "name": "Creatine kinase (CK)", "value": "9,400 U/L", "ref": "30–200 U/L", "flag": "HIGH" },
+        { "name": "Serum creatinine", "value": "2.1 mg/dL", "ref": "0.7–1.3", "flag": "HIGH" },
+        { "name": "Potassium", "value": "5.4 mmol/L", "ref": "3.5–5.1", "flag": "HIGH" },
+        { "name": "Urinalysis", "value": "+blood on dipstick, few RBCs on microscopy", "ref": "—", "flag": "MYOGLOBINURIa suspected" }
+      ],
+      "medications": ["Simvastatin 40 mg daily (3 years)", "Lisinopril 10 mg daily", "Clarithromycin 500 mg BID × 14 days (recent)"],
+      "steps": [
+        {
+          "prompt": "STEP 1 — What history questions do you ask next, and what do you want to know about the timeline?",
+          "hints": ["Compare onset vs. each drug start date", "Ask about OTC/herbal additions and grapefruit", "Volume status and urine output"],
+          "modelAnswer": "Ask: (1) exact start of muscle symptoms relative to clarithromycin (temporal plausibility — symptoms began ~2 weeks after the antibiotic, while simvastatin had been tolerated for 3 years); (2) other myotoxic exposures (fibrates, colchicine, grapefruit juice, new OTCs); (3) dehydration/reduced urine output (worsens myoglobin renal injury); (4) trauma or extreme exertion (alternative CK causes). The timeline strongly suggests a new interacting agent unmasked statin toxicity rather than statin intolerance per se.",
+          "citations": [
+            { "label": "FDA label — Simvastatin, WARNINGS: Myopathy/Rhabdomyolysis", "url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name:\"simvastatin\"&limit=1" }
+          ]
+        },
+        {
+          "prompt": "STEP 2 — What is the most likely cause, and the pharmacological mechanism?",
+          "hints": ["Which enzyme handles simvastatin?", "Which class does clarithromycin belong to for that enzyme?"],
+          "modelAnswer": "Rhabdomyolysis caused by a simvastatin–clarithromycin interaction. Simvastatin's active metabolite is cleared by CYP3A4; clarithromycin is a strong CYP3A4 inhibitor. Co-administration raises simvastatin exposure several-fold (the FDA label contraindicates this combination), driving dose-dependent myotoxicity: myonecrosis → CK ~9,400, myoglobinuria ('blood' on dipstick without RBCs), hyperkalemia and acute kidney injury from myoglobin.",
+          "citations": [
+            { "label": "FDA label — Simvastatin, CONTRAINDICATIONS (strong CYP3A4 inhibitors incl. clarithromycin)", "url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name:\"simvastatin\"&limit=1" },
+            { "label": "FDA label — Simvastatin, DRUG INTERACTIONS (CYP3A4)", "url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name:\"simvastatin\"&limit=1" }
+          ]
+        },
+        {
+          "prompt": "STEP 3 — What data confirm the diagnosis and gauge severity? What else must be checked?",
+          "hints": ["CK trend", "Renal function + electrolytes (K+, Ca2+, PO4)", "ECG"],
+          "modelAnswer": "Confirm rhabdomyolysis with markedly elevated CK (>10× ULN) plus myoglobinuria; quantify complications: serial creatinine/eGFR (AKI stage), potassium, calcium, phosphate, uric acid (released from necrotic muscle), and ECG if K+ elevated. Exclude alternatives: hypothyroidism (TSH), trauma/exertion history, inflammatory myopathy if course atypical. The combination of dark urine, dipstick-positive/RBC-poor urine and high CK is the classic triad.",
+          "citations": [
+            { "label": "FDA label — Simvastatin, ADVERSE REACTIONS (myopathy, rhabdomyolysis)", "url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name:\"simvastatin\"&limit=1" }
+          ]
+        },
+        {
+          "prompt": "STEP 4 — How is this managed (educational answer), and what prevents recurrence?",
+          "hints": ["Stop the offender", "Aggressive fluids", "Never restart the same combo", "Safer statin options"],
+          "modelAnswer": "Management taught in this scenario: immediate discontinuation of simvastatin and clarithromycin (substitute a non-CYP3A4 antibiotic, e.g., doxycycline or azithromycin per prescriber), aggressive IV isotonic fluids to prevent myoglobin cast nephropathy, monitoring/correction of hyperkalemia and AKI, nephrology input if oliguric — this patient needs urgent care, and a teaching tool must say so. Prevention: check interaction potential before prescribing (label contraindicates the combination); if a macrolide is unavoidable, hold simvastatin or switch to a non-CYP3A4 statin (pravastatin/rosuvastatin per prescriber judgment). FAERS reporting data show 'rhabdomyolysis' among statin adverse-event reports.",
+          "citations": [
+            { "label": "FDA label — Simvastatin, DOSAGE & ADMINISTRATION (dosage caps with interacting drugs)", "url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name:\"simvastatin\"&limit=1" },
+            { "label": "openFDA Drug Event API — search 'simvastatin rhabdomyolysis' reports", "url": "https://api.fda.gov/drug/event.json?search=patient.drug.openfda.generic_name:\"simvastatin\"&count=patient.reaction.reactionmeddrapt.exact&limit=8" }
+          ]
+        }
+      ],
+      "teachingPoints": [
+        "Prodrug dependence on CYP3A4 converts an 'ordinary' statin into a high-risk drug with strong inhibitors.",
+        "Dipstick blood without RBCs on microscopy = think myoglobin.",
+        "Labels use contraindications (not warnings) for this combination — that signals severity."
+      ]
+    },
+    {
+      "id": "warfarin-nsaid",
+      "title": "Black stools on 'blood thinner plus painkiller'",
+      "difficulty": "Beginner-Intermediate",
+      "persona": "Anticoagulation clinic / ward",
+      "age": 74,
+      "sex": "Female",
+      "presentation": "Presents with 3 days of black tarry stools, dizziness and fatigue. History: atrial fibrillation on warfarin, osteoarthritis. Self-medicating with 'extra-strength' OTC ibuprofen 400 mg TID for 2 weeks; also took one course of trimethoprim-sulfamethoxazole for UTI last week.",
+      "vitals": { "BP": "98/60", "HR": "108", "Temp": "36.6°C", "RR": "20" },
+      "labs": [
+        { "name": "INR", "value": "4.8", "ref": "2.0–3.0 (therapeutic)", "flag": "HIGH" },
+        { "name": "Hemoglobin", "value": "8.2 g/dL", "ref": "12–16", "flag": "LOW" },
+        { "name": "BUN", "value": "34 mg/dL", "ref": "7–20", "flag": "HIGH (upper GI blood)" }
+      ],
+      "medications": ["Warfarin 5 mg daily", "Ibuprofen 400 mg TID × 14 days (OTC)", "Trimethoprim-sulfamethoxazole DS BID × 3 days (completed)", "Metoprolol succinate 50 mg daily"],
+      "steps": [
+        {
+          "prompt": "STEP 1 — Which two interactions explain this picture, and in which direction does each push?",
+          "hints": ["One interaction is pharmacodynamic, one pharmacokinetic", "Which drug raised the INR?", "Which drug damaged the mucosa?"],
+          "modelAnswer": "Two overlapping interactions: (1) Warfarin + ibuprofen — pharmacodynamic: NSAIDs inhibit platelet cyclooxygenase and erode the gastric mucosa, adding antithrombotic and ulcerogenic effects that warfarin amplifies into bleeding (both listed as increased GI-bleeding risk in the labels). (2) Warfarin + trimethoprim-sulfamethoxazole — pharmacokinetic: SMX inhibits CYP2C9, the clearance route of the potent S-warfarin enantiomer, raising INR. Her INR 4.8 (therapeutic 2–3) with melena and Hb drop is the combined result.",
+          "citations": [
+            { "label": "FDA label — Warfarin, WARNINGS (bleeding; interacting drugs incl. TMP-SMX and NSAIDs)", "url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name:\"warfarin\"&limit=1" },
+            { "label": "FDA label — Ibuprofen, WARNINGS (GI bleeding, ulceration; concomitant anticoagulants)", "url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name:\"ibuprofen\"&limit=1" }
+          ]
+        },
+        {
+          "prompt": "STEP 2 — What is the immediate assessment and what makes this urgent?",
+          "hints": ["Hemodynamic signs", "Labs to repeat and add", "Target-organ symptoms"],
+          "modelAnswer": "Urgency markers: hypotension + tachycardia (shock index ≈1.1), Hb 8.2 with symptomatic dizziness — active clinically significant GI hemorrhage on supratherapeutic anticoagulation. Assess: orthostatics, repeat CBC/INR, type & cross, renal function/electrolytes, ECG (demand ischemia with AF), fecal occult not needed (melena is diagnostic). Risk-stratify the bleed (e.g., Glasgow-Blatchford concept) and screen for prior ulcer disease/H. pylori once stabilized.",
+          "citations": [
+            { "label": "FDA label — Warfarin, WARNINGS: Bleeding", "url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name:\"warfarin\"&limit=1" }
+          ]
+        },
+        {
+          "prompt": "STEP 3 — Outline guideline-style management for warfarin reversal in major bleeding (educational level).",
+          "hints": ["Stop both warfarin and ibuprofen", "Replenish vitamin K-dependent factors", "Give vitamin K", "Resuscitate"],
+          "modelAnswer": "Textbook management of warfarin-associated major bleeding: hold warfarin; ABCs with IV access and volume/blood resuscitation (transfuse per thresholds); 4-factor prothrombin complex concentrate (PCC) for rapid factor replacement — preferred over FFP for speed/volume; IV phytonadione (vitamin K1) 5–10 mg to sustain reversal (takes ~12–24 h); stop ibuprofen entirely; GI consult for endoscopy. The warfarin label's reversal description (vitamin K ± factors) underpins this. Reassessment of AF stroke risk guides restart timing.",
+          "citations": [
+            { "label": "FDA label — Warfarin, OVERDOSAGE (reversal with vitamin K, factors)", "url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name:\"warfarin\"&limit=1" }
+          ]
+        },
+        {
+          "prompt": "STEP 4 — What counseling prevents recurrence?",
+          "hints": ["OTC vigilance", "Antibiotic–warfarin heads-up", "INR monitoring after any new drug"],
+          "modelAnswer": "Counseling: (1) avoid all OTC NSAIDs/aspirin — acetaminophen within label limits is the usual teaching alternative; (2) any new medicine — especially antibiotics (TMP-SMX, macrolides, fluoroquinolones), azoles, amiodarone — warrants INR check within ~3–5 days and often a dose reduction plan; (3) never self-start 'leftover' antibiotics while warfarin is active; (4) recognize bleeding warning signs (melena, hematuria, unusual bruising) and seek care; (5) keep consistent vitamin K intake, not zero it.",
+          "citations": [
+            { "label": "FDA label — Warfarin, PATIENT COUNSELING INFORMATION", "url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name:\"warfarin\"&limit=1" },
+            { "label": "FDA label — Ibuprofen (OTC), Warnings: ask a doctor before use if taking anticoagulants", "url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name:\"ibuprofen\"&limit=1" }
+          ]
+        }
+      ],
+      "teachingPoints": [
+        "PD (mucosa+platelet) and PK (CYP2C9) interactions can stack in one patient.",
+        "OTC status ≠ low risk: the ibuprofen label itself warns anticoagulant users.",
+        "INR is a lagging indicator once bleeding starts — severity, not just number, drives reversal."
+      ]
+    },
+    {
+      "id": "metformin-sickday",
+      "title": "Vomiting, diarrhea and 'should I skip my pills?'",
+      "difficulty": "Beginner",
+      "persona": "Primary care telephone triage",
+      "age": 58,
+      "sex": "Male",
+      "presentation": "Type 2 diabetes and hypertension. Two days of gastroenteritis with vomiting, diarrhea, and barely any fluid intake. Calls to ask whether to keep taking his usual pills. Reports deep, rapid breathing since this morning and vague abdominal pain.",
+      "vitals": { "BP": "100/65 (lying), 86/55 (standing)", "HR": "112", "Temp": "38.2°C", "RR": "26 (deep)" },
+      "labs": [
+        { "name": "eGFR (yesterday)", "value": "78 mL/min", "ref": ">90 baseline typical", "flag": "↓" },
+        { "name": "eGFR (today)", "value": "38 mL/min", "ref": "—", "flag": "ACUTE FALL" },
+        { "name": "Venous lactate", "value": "5.8 mmol/L", "ref": "<2.0", "flag": "HIGH" },
+        { "name": "pH", "value": "7.21", "ref": "7.35–7.45", "flag": "LOW" },
+        { "name": "Glucose", "value": "11.1 mmol/L", "ref": "—", "flag": "no DKA expected (ketones low)" }
+      ],
+      "medications": ["Metformin 1000 mg BID", "Ramipril 5 mg daily", "Empagliflozin 10 mg daily"],
+      "steps": [
+        {
+          "prompt": "STEP 1 — Which home medications should be paused today, and why?",
+          "hints": ["Think 'sick-day rules' (SADMANS groups)", "Which drug accumulates renally?", "Which drug worsens volume depletion?"],
+          "modelAnswer": "Pause: (1) Metformin — in volume depletion with AKI it accumulates; the label's boxed warning is lactic acidosis in conditions that cause hypoxia or impair renal clearance. (2) Ramipril — ACE inhibition lowers GFR further during hypovolemia (efferent arteriolar dilation) and risks hyperkalemia. (3) Empagliflozin — SGLT2 inhibitors increase natriuresis/volume loss and can precipitate euglycemic ketoacidosis during acute illness. Deep rapid breathing + lactate 5.8 + pH 7.21 with low ketones = probable metformin-associated lactic acidosis (MALA) — same-day medical evaluation, not home advice.",
+          "citations": [
+            { "label": "FDA label — Metformin, BOXED WARNING (lactic acidosis; renal impairment, hypoxia)", "url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name:\"metformin\"&limit=1" }
+          ]
+        },
+        {
+          "prompt": "STEP 2 — Interpret the acid–base picture: what kind of acidosis and why the Kussmaul-like breathing?",
+          "hints": ["Anion gap metabolic acidosis pattern", "Lactate's contribution", "Respiratory compensation"],
+          "modelAnswer": "High-anion-gap metabolic acidosis (pH 7.21 with primary bicarbonate loss expected; lactate 5.8 accounts for most of the gap). The deep, rapid (Kussmaul-type) respirations are appropriate respiratory compensation — hyperventilation to blow off CO2. Differentials for the gap (remembered as classics: lactate, ketones, renal failure, toxins) are narrowed by low ketones and the AKI + metformin context to MALA, with uremic contribution from AKI.",
+          "citations": [
+            { "label": "FDA label — Metformin, ADVERSE REACTIONS / Postmarketing (lactic acidosis)", "url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name:\"metformin\"&limit=1" }
+          ]
+        },
+        {
+          "prompt": "STEP 3 — Which concurrent drugs/conditions are the classic metformin lactic-acidosis precipitants?",
+          "hints": ["Renal impairment thresholds in the label", "Iodinated contrast", "Alcohol, hypoxia, hepatic disease"],
+          "modelAnswer": "Label-identified precipitants: renal impairment (use contraindicated/restricted below eGFR thresholds), conditions causing tissue hypoxia (acute heart failure, respiratory failure, shock from dehydration here), hepatic impairment, excessive alcohol, and radiologic iodinated contrast studies (label directs temporary discontinuation at/before contrast in patients with reduced renal function). This patient stacked hypovolemia → prerenal AKI → metformin accumulation → impaired hepatic lactate clearance from hypoperfusion.",
+          "citations": [
+            { "label": "FDA label — Metformin, WARNINGS AND PRECAUTIONS (lactic acidosis risk factors, contrast)", "url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name:\"metformin\"&limit=1" },
+            { "label": "FDA label — Metformin, DOSAGE AND ADMINISTRATION (eGFR restrictions)", "url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name:\"metformin\"&limit=1" }
+          ]
+        },
+        {
+          "prompt": "STEP 4 — What are 'sick-day rules' you would teach this patient for the future?",
+          "hints": ["When to withhold vs. when to seek help", "Rechallenge only after recovery", "Carry a list"],
+          "modelAnswer": "Teach: during vomiting/diarrhea/fever with poor intake — hold metformin, SGLT2 inhibitors, ACE/ARBs, diuretics and NSAIDs ('sick-day rules'), push oral rehydration, and restart 24–48 h after eating/drinking normally AND ideally after renal function recheck if illness was severe. Seek urgent care for: deep rapid breathing, confusion, persistent vomiting, oliguria, or chest symptoms. Reinstating metformin after recovery is expected; repeated MALA risk prompts prescriber review of renal monitoring frequency.",
+          "citations": [
+            { "label": "FDA label — Metformin, INFORMATION FOR PATIENTS", "url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name:\"metformin\"&limit=1" }
+          ]
+        }
+      ],
+      "teachingPoints": [
+        "Metformin's danger is not the drug alone — it is accumulation in AKI/hypoxia.",
+        "SGLT2 inhibitors add euglycemic ketoacidosis risk during acute illness (normal glucose ≠ safe).",
+        "Kussmaul breathing is compensation, not a new disease to treat with sedation."
+      ]
+    }
+  ]
+}

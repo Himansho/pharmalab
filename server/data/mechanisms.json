@@ -1,0 +1,262 @@
+{
+  "_meta": {
+    "note": "Curated mechanism-of-action graphs for common drugs. Graph content is standard pharmacology cross-checked against FDA label Clinical Pharmacology / Mechanism of Action sections. Educational use only.",
+    "schema": "nodes: {id,label,type,note}; edges: {from,to,kind}; type in drug|enzyme|receptor|transporter|ion_channel|molecule|pathway|effect",
+    "updated": "2026-09"
+  },
+  "ibuprofen": {
+    "aliases": ["advil", "motrin", "brufen", "nuprin"],
+    "class": "NSAID (propionic acid derivative)",
+    "summary": "Ibuprofen inhibits cyclooxygenase-1 and -2 (COX-1/COX-2), reducing conversion of arachidonic acid to prostaglandin precursors. Lower prostaglandin levels diminish pain, fever and inflammation signaling.",
+    "citations": [
+      { "label": "FDA label — Ibuprofen, CLINICAL PHARMACOLOGY (COX inhibition)", "url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name:\"ibuprofen\"&limit=1" }
+    ],
+    "nodes": [
+      { "id": "ibuprofen", "label": "Ibuprofen", "type": "drug", "note": "Non-selective NSAID; inhibits both COX isoforms reversibly." },
+      { "id": "arachidonic_acid", "label": "Arachidonic acid", "type": "molecule", "note": "Membrane phospholipid released by phospholipase A2 at injury/inflammation sites." },
+      { "id": "cox1", "label": "COX-1", "type": "enzyme", "note": "Constitutive enzyme producing prostaglandins that protect gastric mucosa and support platelet aggregation (TXA2)." },
+      { "id": "cox2", "label": "COX-2", "type": "enzyme", "note": "Inducible enzyme at inflammation sites; produces prostaglandins mediating pain, fever and inflammation." },
+      { "id": "prostaglandins", "label": "Prostaglandins (PGE2 etc.)", "type": "molecule", "note": "Lipid mediators that sensitize pain receptors, act on the hypothalamic heat set-point, and sustain inflammation." },
+      { "id": "pain_fever", "label": "Pain & fever", "type": "effect", "note": "Analgesic/antipyretic target — reduced when PGE2 synthesis falls." },
+      { "id": "inflammation", "label": "Inflammation", "type": "effect", "note": "Anti-inflammatory target of COX-2 inhibition." },
+      { "id": "gi_mucosa", "label": "Gastric mucosal protection", "type": "effect", "note": "COX-1 prostaglandins maintain mucus/bicarbonate barrier — inhibition explains GI risk." }
+    ],
+    "edges": [
+      { "from": "arachidonic_acid", "to": "cox1", "kind": "produces", "label": "substrate" },
+      { "from": "arachidonic_acid", "to": "cox2", "kind": "produces", "label": "substrate" },
+      { "from": "cox1", "to": "prostaglandins", "kind": "produces" },
+      { "from": "cox2", "to": "prostaglandins", "kind": "produces" },
+      { "from": "prostaglandins", "to": "pain_fever", "kind": "leads_to" },
+      { "from": "prostaglandins", "to": "inflammation", "kind": "leads_to" },
+      { "from": "prostaglandins", "to": "gi_mucosa", "kind": "leads_to" },
+      { "from": "ibuprofen", "to": "cox1", "kind": "inhibits" },
+      { "from": "ibuprofen", "to": "cox2", "kind": "inhibits" }
+    ]
+  },
+  "warfarin": {
+    "aliases": ["coumadin", "jantoven", "marevan"],
+    "class": "Vitamin K antagonist anticoagulant",
+    "summary": "Warfarin inhibits VKORC1, blocking regeneration of reduced vitamin K needed to gamma-carboxylate clotting factors II, VII, IX and X. Without carboxylation these factors cannot bind phospholipid surfaces, so coagulation is impaired.",
+    "citations": [
+      { "label": "FDA label — Warfarin, CLINICAL PHARMACOLOGY (vitamin K epoxide reductase)", "url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name:\"warfarin\"&limit=1" },
+      { "label": "FDA label — Warfarin, DRUG INTERACTIONS", "url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name:\"warfarin\"&limit=1" }
+    ],
+    "nodes": [
+      { "id": "warfarin", "label": "Warfarin", "type": "drug", "note": "Coumarin anticoagulant; S-warfarin metabolized by CYP2C9 — many interactions." },
+      { "id": "vkorc1", "label": "VKORC1", "type": "enzyme", "note": "Vitamin K epoxide reductase — recycles oxidized vitamin K back to its reduced form." },
+      { "id": "vitamin_k_cycle", "label": "Reduced vitamin K", "type": "molecule", "note": "Cofactor for gamma-glutamyl carboxylase." },
+      { "id": "clotting_factors", "label": "Factors II, VII, IX, X", "type": "molecule", "note": "Vitamin K-dependent clotting factors; require gamma-carboxylation to function." },
+      { "id": "coagulation", "label": "Effective coagulation", "type": "effect", "note": "Impaired as functional factor levels fall (delayed onset ~days)." },
+      { "id": "thrombosis_prevented", "label": "Reduced thromboembolism", "type": "effect", "note": "Therapeutic goal in AF, VTE, mechanical valves." },
+      { "id": "bleeding_risk", "label": "Bleeding risk", "type": "effect", "note": "Major adverse effect; potentiated by NSAIDs, antibiotics, amiodarone, etc." }
+    ],
+    "edges": [
+      { "from": "warfarin", "to": "vkorc1", "kind": "inhibits" },
+      { "from": "vkorc1", "to": "vitamin_k_cycle", "kind": "produces", "label": "regeneration blocked" },
+      { "from": "vitamin_k_cycle", "to": "clotting_factors", "kind": "activates", "label": "gamma-carboxylation" },
+      { "from": "clotting_factors", "to": "coagulation", "kind": "leads_to" },
+      { "from": "coagulation", "to": "thrombosis_prevented", "kind": "leads_to" },
+      { "from": "warfarin", "to": "bleeding_risk", "kind": "leads_to" }
+    ]
+  },
+  "metformin": {
+    "aliases": ["glucophage", "fortamet", "riomet"],
+    "class": "Biguanide antihyperglycemic",
+    "summary": "Metformin inhibits mitochondrial complex I, raising the AMP/ATP ratio and activating AMPK. The result is suppressed hepatic gluconeogenesis and increased peripheral insulin sensitivity, lowering blood glucose without causing hypoglycemia.",
+    "citations": [
+      { "label": "FDA label — Metformin, CLINICAL PHARMACOLOGY (AMPK, hepatic glucose)", "url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name:\"metformin\"&limit=1" }
+    ],
+    "nodes": [
+      { "id": "metformin", "label": "Metformin", "type": "drug", "note": "First-line type 2 diabetes agent; renally excreted unchanged." },
+      { "id": "complex1", "label": "Mitochondrial complex I", "type": "enzyme", "note": "Inhibition lowers ATP, raises AMP in hepatocytes." },
+      { "id": "ampk", "label": "AMPK", "type": "enzyme", "note": "Cellular energy sensor activated by high AMP/ATP ratio." },
+      { "id": "gluconeogenesis", "label": "Hepatic gluconeogenesis", "type": "pathway", "note": "Major driver of fasting hyperglycemia in T2DM." },
+      { "id": "insulin_sensitivity", "label": "Peripheral insulin sensitivity", "type": "pathway", "note": "Secondary effect increasing muscle glucose uptake." },
+      { "id": "glucose_low", "label": "Lower blood glucose", "type": "effect", "note": "Net therapeutic effect; no hypoglycemia alone." },
+      { "id": "lactic_acidosis", "label": "Lactic acidosis (rare)", "type": "effect", "note": "Risk in renal impairment/hypoxia — boxed warning; metformin accumulates when eGFR <30." }
+    ],
+    "edges": [
+      { "from": "metformin", "to": "complex1", "kind": "inhibits" },
+      { "from": "complex1", "to": "ampk", "kind": "leads_to", "label": "↑AMP activates" },
+      { "from": "ampk", "to": "gluconeogenesis", "kind": "inhibits" },
+      { "from": "metformin", "to": "insulin_sensitivity", "kind": "activates" },
+      { "from": "gluconeogenesis", "to": "glucose_low", "kind": "leads_to", "label": "reduction" },
+      { "from": "insulin_sensitivity", "to": "glucose_low", "kind": "leads_to", "label": "reduction" },
+      { "from": "metformin", "to": "lactic_acidosis", "kind": "leads_to", "label": "rare, if accumulates" }
+    ]
+  },
+  "atorvastatin": {
+    "aliases": ["lipitor", "sortis"],
+    "class": "HMG-CoA reductase inhibitor (statin)",
+    "summary": "Atorvastatin competitively inhibits HMG-CoA reductase, the rate-limiting step of hepatic cholesterol synthesis. Liver cells respond by upregulating LDL receptors, clearing more LDL from plasma and lowering cardiovascular risk.",
+    "citations": [
+      { "label": "FDA label — Atorvastatin, CLINICAL PHARMACOLOGY", "url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name:\"atorvastatin\"&limit=1" }
+    ],
+    "nodes": [
+      { "id": "atorvastatin", "label": "Atorvastatin", "type": "drug", "note": "Potent, long-acting statin; CYP3A4 substrate." },
+      { "id": "hmgcoa_reductase", "label": "HMG-CoA reductase", "type": "enzyme", "note": "Rate-limiting enzyme of the mevalonate cholesterol pathway." },
+      { "id": "mevalonate", "label": "Mevalonate", "type": "molecule", "note": "Product of HMG-CoA reduction; precursor of cholesterol." },
+      { "id": "hepatic_cholesterol", "label": "Hepatic cholesterol pool", "type": "pathway", "note": "Falls when synthesis is blocked." },
+      { "id": "ldl_receptor", "label": "LDL receptor (hepatocyte)", "type": "receptor", "note": "SREBP-2 upregulates surface LDL receptors when intracellular sterol drops." },
+      { "id": "plasma_ldl", "label": "Plasma LDL-C", "type": "molecule", "note": "Cleared faster via receptor-mediated uptake." },
+      { "id": "cv_risk", "label": "Atherosclerotic CV events", "type": "effect", "note": "Reduced with sustained LDL lowering." },
+      { "id": "myopathy", "label": "Myopathy / rhabdomyolysis", "type": "effect", "note": "Class adverse effect; risk ↑ with CYP3A4 inhibitors, fibrates." }
+    ],
+    "edges": [
+      { "from": "atorvastatin", "to": "hmgcoa_reductase", "kind": "inhibits" },
+      { "from": "hmgcoa_reductase", "to": "mevalonate", "kind": "produces" },
+      { "from": "mevalonate", "to": "hepatic_cholesterol", "kind": "leads_to" },
+      { "from": "hepatic_cholesterol", "to": "ldl_receptor", "kind": "leads_to", "label": "↓ sterol → ↑ receptors" },
+      { "from": "ldl_receptor", "to": "plasma_ldl", "kind": "leads_to", "label": "clearance ↓ LDL" },
+      { "from": "plasma_ldl", "to": "cv_risk", "kind": "leads_to" },
+      { "from": "atorvastatin", "to": "myopathy", "kind": "leads_to", "label": "off-target" }
+    ]
+  },
+  "simvastatin": {
+    "aliases": ["zocor"],
+    "class": "HMG-CoA reductase inhibitor (statin)",
+    "summary": "Simvastatin (a lactone prodrug hydrolyzed to its active beta-hydroxy acid) inhibits HMG-CoA reductase, reducing hepatic cholesterol synthesis and upregulating LDL receptors. It is a major CYP3A4 substrate — strong inhibitors (e.g., clarithromycin) sharply raise exposure and myopathy risk.",
+    "citations": [
+      { "label": "FDA label — Simvastatin, CLINICAL PHARMACOLOGY & DRUG INTERACTIONS (CYP3A4)", "url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name:\"simvastatin\"&limit=1" }
+    ],
+    "nodes": [
+      { "id": "simvastatin", "label": "Simvastatin (prodrug)", "type": "drug", "note": "Lactone hydrolyzed to active acid; high CYP3A4 dependence." },
+      { "id": "cyp3a4", "label": "CYP3A4", "type": "enzyme", "note": "Clears active metabolite; inhibited by macrolides, azoles, protease inhibitors, grapefruit." },
+      { "id": "hmgcoa_reductase", "label": "HMG-CoA reductase", "type": "enzyme", "note": "Target enzyme of the statin class." },
+      { "id": "hepatic_cholesterol", "label": "Hepatic cholesterol synthesis", "type": "pathway", "note": "Rate-limited by HMG-CoA reductase." },
+      { "id": "ldl_receptor", "label": "LDL receptor upregulation", "type": "receptor", "note": "Compensatory response to low intracellular sterol." },
+      { "id": "plasma_ldl", "label": "Plasma LDL-C ↓", "type": "effect", "note": "Therapeutic effect." },
+      { "id": "myopathy", "label": "Myopathy → rhabdomyolysis", "type": "effect", "note": "Exposure-dependent; ↑CK, myoglobinuria, AKI risk." }
+    ],
+    "edges": [
+      { "from": "simvastatin", "to": "cyp3a4", "kind": "binds_to", "label": "metabolized by" },
+      { "from": "simvastatin", "to": "hmgcoa_reductase", "kind": "inhibits" },
+      { "from": "hmgcoa_reductase", "to": "hepatic_cholesterol", "kind": "leads_to" },
+      { "from": "hepatic_cholesterol", "to": "ldl_receptor", "kind": "leads_to" },
+      { "from": "ldl_receptor", "to": "plasma_ldl", "kind": "leads_to" },
+      { "from": "cyp3a4", "to": "myopathy", "kind": "inhibits", "label": "↓ clearance → ↑ exposure" }
+    ]
+  },
+  "lisinopril": {
+    "aliases": ["zestril", " Prinivil", "qipaml"],
+    "class": "ACE inhibitor",
+    "summary": "Lisinopril inhibits angiotensin-converting enzyme, blocking conversion of angiotensin I to angiotensin II. Less angiotensin II means vasodilation and reduced aldosterone; ACE inhibition also raises bradykinin, contributing to cough and, rarely, angioedema.",
+    "citations": [
+      { "label": "FDA label — Lisinopril, CLINICAL PHARMACOLOGY", "url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name:\"lisinopril\"&limit=1" }
+    ],
+    "nodes": [
+      { "id": "lisinopril", "label": "Lisinopril", "type": "drug", "note": "Long-acting ACE inhibitor; not metabolized, renally excreted." },
+      { "id": "ace", "label": "ACE (kininase II)", "type": "enzyme", "note": "Converts angiotensin I → II and degrades bradykinin." },
+      { "id": "angiotensin1", "label": "Angiotensin I", "type": "molecule", "note": "Formed from angiotensinogen by renin." },
+      { "id": "angiotensin2", "label": "Angiotensin II", "type": "molecule", "note": "Potent vasoconstrictor; stimulates aldosterone release." },
+      { "id": "aldosterone", "label": "Aldosterone", "type": "molecule", "note": "Sodium/water retention and K+ excretion; falls with ACE inhibition (hyperkalemia risk)." },
+      { "id": "bradykinin", "label": "Bradykinin ↑", "type": "molecule", "note": "Accumulates when ACE is blocked; mediates cough/angioedema." },
+      { "id": "bp_low", "label": "Blood pressure ↓", "type": "effect", "note": "Therapeutic effect via vasodilation + natriuresis." }
+    ],
+    "edges": [
+      { "from": "angiotensin1", "to": "ace", "kind": "produces", "label": "substrate" },
+      { "from": "ace", "to": "angiotensin2", "kind": "produces" },
+      { "from": "angiotensin2", "to": "aldosterone", "kind": "activates" },
+      { "from": "angiotensin2", "to": "bp_low", "kind": "leads_to", "label": "raises BP when active" },
+      { "from": "aldosterone", "to": "bp_low", "kind": "leads_to", "label": "raises BP when active" },
+      { "from": "lisinopril", "to": "ace", "kind": "inhibits" },
+      { "from": "ace", "to": "bradykinin", "kind": "inhibits", "label": "degradation blocked" }
+    ]
+  },
+  "omeprazole": {
+    "aliases": ["prilosec", "losec"],
+    "class": "Proton pump inhibitor",
+    "summary": "Omeprazole is a weak-base prodrug activated in the acidic canaliculi of parietal cells, where it forms an irreversible disulfide bond with the H+/K+-ATPase. Pump inhibition suppresses basal and stimulated gastric acid secretion for ~24-48 h.",
+    "citations": [
+      { "label": "FDA label — Omeprazole, CLINICAL PHARMACOLOGY", "url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name:\"omeprazole\"&limit=1" }
+    ],
+    "nodes": [
+      { "id": "omeprazole", "label": "Omeprazole (prodrug)", "type": "drug", "note": "Accumulates in acidic parietal canaliculi; CYP2C19 activation matters." },
+      { "id": "proton_pump", "label": "H+/K+-ATPase", "type": "enzyme", "note": "Final common step of acid secretion; irreversibly inhibited." },
+      { "id": "gastric_acid", "label": "Gastric acid secretion", "type": "pathway", "note": "Both basal and meal-stimulated secretion drop." },
+      { "id": "ph_low", "label": "Luminal pH ↑", "type": "effect", "note": "Less acid → higher intragastric pH." },
+      { "id": "ulcer_healing", "label": "Ulcer healing / GERD relief", "type": "effect", "note": "Therapeutic effect." },
+      { "id": "infection_risk", "label": "↑ C. difficile / fracture risk (long-term)", "type": "effect", "note": "Consequence of prolonged acid suppression." }
+    ],
+    "edges": [
+      { "from": "omeprazole", "to": "proton_pump", "kind": "inhibits", "label": "irreversible" },
+      { "from": "proton_pump", "to": "gastric_acid", "kind": "produces" },
+      { "from": "gastric_acid", "to": "ph_low", "kind": "leads_to", "label": "↓ acid → pH ↑" },
+      { "from": "ph_low", "to": "ulcer_healing", "kind": "leads_to" },
+      { "from": "ph_low", "to": "infection_risk", "kind": "leads_to" }
+    ]
+  },
+  "amoxicillin": {
+    "aliases": ["amoxil", "mox", "clamox"],
+    "class": "Aminopenicillin (beta-lactam)",
+    "summary": "Amoxicillin binds penicillin-binding proteins (transpeptidases), blocking peptidoglycan cross-linking in the bacterial cell wall. Weakened walls and unchecked autolysins lead to osmotic lysis of dividing bacteria.",
+    "citations": [
+      { "label": "FDA label — Amoxicillin, CLINICAL PHARMACOLOGY (mechanism)", "url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name:\"amoxicillin\"&limit=1" }
+    ],
+    "nodes": [
+      { "id": "amoxicillin", "label": "Amoxicillin", "type": "drug", "note": "Beta-lactam; stable to gastric acid, good oral bioavailability." },
+      { "id": "pbps", "label": "PBPs (transpeptidases)", "type": "enzyme", "note": "Membrane enzymes cross-linking peptidoglycan." },
+      { "id": "peptidoglycan", "label": "Peptidoglycan cross-linking", "type": "pathway", "note": "Blocked → structurally weak wall." },
+      { "id": "cell_wall", "label": "Bacterial cell wall integrity", "type": "effect", "note": "Loss exposes osmotic fragility." },
+      { "id": "lysis", "label": "Bacterial lysis (bactericidal)", "type": "effect", "note": "Net killing of susceptible organisms." },
+      { "id": "resistance", "label": "Beta-lactamase resistance", "type": "effect", "note": "Common escape route — why clavulanate combos exist." }
+    ],
+    "edges": [
+      { "from": "amoxicillin", "to": "pbps", "kind": "binds_to", "label": "acylates" },
+      { "from": "pbps", "to": "peptidoglycan", "kind": "produces" },
+      { "from": "peptidoglycan", "to": "cell_wall", "kind": "leads_to" },
+      { "from": "amoxicillin", "to": "peptidoglycan", "kind": "blocks" },
+      { "from": "cell_wall", "to": "lysis", "kind": "leads_to", "label": "failure → lysis" }
+    ]
+  },
+  "salbutamol": {
+    "aliases": ["albuterol", "ventolin", "proair", "volmax"],
+    "class": "Short-acting beta-2 agonist (SABA)",
+    "summary": "Salbutamol stimulates airway beta-2 adrenergic receptors, raising cAMP via adenylyl cyclase. cAMP-dependent PKA signaling relaxes airway smooth muscle (bronchodilation); spillover onto skeletal-muscle and cardiac beta receptors causes tremor and tachycardia.",
+    "citations": [
+      { "label": "FDA label — Albuterol sulfate, CLINICAL PHARMACOLOGY", "url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name:\"albuterol sulfate\"&limit=1" }
+    ],
+    "nodes": [
+      { "id": "salbutamol", "label": "Salbutamol / Albuterol", "type": "drug", "note": "Inhaled SABA; selective for beta-2 at therapeutic doses." },
+      { "id": "beta2r", "label": "β2-adrenergic receptor", "type": "receptor", "note": "Gs-coupled GPCR on airway smooth muscle." },
+      { "id": "adenylyl_cyclase", "label": "Adenylyl cyclase (Gs)", "type": "enzyme", "note": "Activates upon receptor stimulation." },
+      { "id": "camp", "label": "cAMP ↑ / PKA", "type": "molecule", "note": "Second messenger; PKA lowers intracellular Ca2+ and desensitizes MLCK." },
+      { "id": "smoc_relax", "label": "Smooth-muscle relaxation", "type": "pathway", "note": "Airway caliber increases." },
+      { "id": "bronchodilation", "label": "Bronchodilation (relief)", "type": "effect", "note": "Rapid rescue effect in asthma/COPD." },
+      { "id": "tremor_tachy", "label": "Tremor / tachycardia", "type": "effect", "note": "Dose-limiting beta effects in skeletal muscle and heart." }
+    ],
+    "edges": [
+      { "from": "salbutamol", "to": "beta2r", "kind": "activates", "label": "agonist" },
+      { "from": "beta2r", "to": "adenylyl_cyclase", "kind": "activates" },
+      { "from": "adenylyl_cyclase", "to": "camp", "kind": "produces" },
+      { "from": "camp", "to": "smoc_relax", "kind": "leads_to" },
+      { "from": "smoc_relax", "to": "bronchodilation", "kind": "leads_to" },
+      { "from": "salbutamol", "to": "tremor_tachy", "kind": "leads_to", "label": "off-target" }
+    ]
+  },
+  "aspirin": {
+    "aliases": ["acetylsalicylic acid", "ecotrin", "empirin", "bayer"],
+    "class": "Salicylate NSAID (irreversible COX acetylator)",
+    "summary": "Aspirin acetylates COX-1 in platelets, irreversibly blocking thromboxane A2 production for the platelet's lifespan (7-10 days) — the basis of its antiplatelet cardioprotection. Higher doses add COX-2 inhibition for analgesia; gastric prostaglandin loss drives GI bleeding risk.",
+    "citations": [
+      { "label": "FDA label — Aspirin, CLINICAL PHARMACOLOGY", "url": "https://api.fda.gov/drug/label.json?search=openfda.generic_name:\"aspirin\"&limit=1" }
+    ],
+    "nodes": [
+      { "id": "aspirin", "label": "Aspirin", "type": "drug", "note": "Acetylates a serine residue in the COX channel." },
+      { "id": "cox1", "label": "COX-1 (platelet)", "type": "enzyme", "note": "Anucleate platelets cannot resynthesize it — inhibition lasts the cell's life." },
+      { "id": "txa2", "label": "Thromboxane A2", "type": "molecule", "note": "Potent platelet activator and vasoconstrictor." },
+      { "id": "aggregation", "label": "Platelet aggregation", "type": "pathway", "note": "Dampened → antiplatelet effect." },
+      { "id": "cardioprotection", "label": "↓ MI / stroke events", "type": "effect", "note": "Goal of low-dose therapy." },
+      { "id": "cox2", "label": "COX-2 (higher doses)", "type": "enzyme", "note": "Adds anti-inflammatory/analgesic effect at analgesic doses." },
+      { "id": "gi_bleed", "label": "GI erosion / bleeding", "type": "effect", "note": "Loss of mucosal prostaglandins + antiplatelet effect." }
+    ],
+    "edges": [
+      { "from": "aspirin", "to": "cox1", "kind": "inhibits", "label": "irreversible" },
+      { "from": "aspirin", "to": "cox2", "kind": "inhibits", "label": "at analgesic dose" },
+      { "from": "cox1", "to": "txa2", "kind": "produces" },
+      { "from": "txa2", "to": "aggregation", "kind": "activates" },
+      { "from": "aggregation", "to": "cardioprotection", "kind": "leads_to", "label": "inhibition gives benefit" },
+      { "from": "cox1", "to": "gi_bleed", "kind": "leads_to", "label": "mucosal PG loss when blocked" }
+    ]
+  }
+}
