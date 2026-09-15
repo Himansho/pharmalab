@@ -43,7 +43,8 @@ npm run build && npm start   # serves dist/ + API from :8787
 ```
 
 ### Android client (APK) — fully standalone
-**One 1.3 MB APK contains the whole app.** No companion server, no pairing, no config:
+**One ~110 KB APK contains the whole app** (a single self-contained HTML bundle —
+nothing external, so it renders fine under `file://`). No companion server, no pairing, no config:
 open it and PharmaLab runs, fetching drug data **directly** from openFDA / RxNorm /
 PubMed (all CORS-enabled public APIs) and using a bundled offline knowledge pack
 (mechanism graphs, clinical cases). Results cache locally for 24 h, so repeat lookups

@@ -29,9 +29,10 @@ public class MainActivity extends Activity {
         WebSettings s = web.getSettings();
         s.setJavaScriptEnabled(true);          // SPA requires JS
         s.setDomStorageEnabled(true);          // localStorage: theme + response cache
-        s.setAllowFileAccess(false);
+        s.setAllowFileAccess(true);            // page + assets come from file:///android_asset
         s.setAllowContentAccess(false);
         s.setCacheMode(WebSettings.LOAD_DEFAULT);
+        android.webkit.WebView.setWebContentsDebuggingEnabled(true); // dev inspect: chrome://inspect
 
         web.setWebViewClient(new WebViewClient() {
             @Override
@@ -43,6 +44,19 @@ public class MainActivity extends Activity {
                             android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url)));
                 } catch (Exception ignored) { }
                 return true;
+            }
+
+            @Override
+            public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+                // Never leave the user on a blank screen — show what failed.
+                if (failingUrl != null && failingUrl.startsWith("file://")) {
+                    String html = "<html><body style='background:#0f1a18;color:#e8f1ee;font-family:sans-serif;"
+                            + "display:flex;align-items:center;justify-content:center;height:100vh;margin:0'>"
+                            + "<div style='text-align:center'><h2>PharmaLab failed to start</h2>"
+                            + "<p style='color:#9fb8b0'>" + description + "</p>"
+                            + "<p>Reinstall the APK from the GitHub release, then reopen.</p></div></body></html>";
+                    view.loadDataWithBaseURL(null, html, "text/html", "utf-8", null);
+                }
             }
         });
 
