@@ -20,8 +20,8 @@ const PORT = Number(process.env.PORT || 8787)
 const DISCLAIMER = 'PharmaLab is for EDUCATIONAL and research use only. Data are aggregated from public sources (openFDA, RxNorm, PubMed) and may be outdated or incomplete; openFDA explicitly states its data should not be relied on for medical decisions. This app is not a clinical decision tool and does not store patient data.'
 
 // ---- curated data -----------------------------------------------------------
-const mechanisms = JSON.parse(await readFile(path.join(__dirname, 'data', 'mechanisms.json'), 'utf8'))
-const casesData = JSON.parse(await readFile(path.join(__dirname, 'data', 'cases.json'), 'utf8'))
+const mechanisms = JSON.parse(await readFile(path.join(__dirname, '..', 'shared', 'data', 'mechanisms.json'), 'utf8'))
+const casesData = JSON.parse(await readFile(path.join(__dirname, '..', 'shared', 'data', 'cases.json'), 'utf8'))
 const aliasIndex = new Map()
 for (const [key, m] of Object.entries(mechanisms)) {
   if (key === '_meta') continue

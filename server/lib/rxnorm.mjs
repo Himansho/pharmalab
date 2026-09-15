@@ -9,11 +9,13 @@ export async function lookupByName(name) {
   return cached(`rxnorm-lookup:${name.toLowerCase()}`, 60 * 60_000, async () => {
     try {
       const json = await jsonFetch(url)
-      const idGroup = json.idGroup
-      if (!idGroup || !idGroup.rxnormid || !idGroup.rxnormid.length) return null
-      // Prefer ingredient (pin) concepts; take first match's RxCUI.
-      const best = idGroup.rxnormid[0]
-      return { rxcui: best.rxcui, name: best.name }
+      // RxNorm JSON quirk: array of STRING ids under "rxnormId" (capital D).
+      const raw = json.idGroup?.rxnormId ?? json.idGroup?.rxnormid
+      const list = Array.isArray(raw) ? raw : raw ? [raw] : []
+      if (!list.length) return null
+      const first = list[0]
+      if (typeof first === 'string') return { rxcui: first, name: '' }
+      return { rxcui: first.rxcui || first.rxnormid, name: first.name || '' }
     } catch { return null }
   })
 }
@@ -47,14 +49,15 @@ export async function normalize(name) {
   const hit = await lookupByName(name)
   if (!hit) return { query: name, resolved: false }
   const [props, rel] = await Promise.all([properties(hit.rxcui), relatedNames(hit.rxcui)])
+  const displayName = props?.name || props?.clinicalDrugName || hit.name || rel.generic[0] || name
   return {
     query: name,
     resolved: true,
     rxcui: hit.rxcui,
-    rxnormName: hit.name,
-    clinicalDrugName: props?.clinicalDrugName || hit.name,
-    type: hit.name && props?.recordType ? props.recordType : undefined,
-    genericNames: rel.generic.length ? rel.generic : [hit.name],
+    rxnormName: displayName,
+    clinicalDrugName: props?.clinicalDrugName || displayName,
+    type: props?.recordType,
+    genericNames: rel.generic.length ? rel.generic : [displayName],
     brandNames: rel.brand,
     rxcuiUrl: `https://rxnav.nlm.nih.gov/REST/rxcui/${hit.rxcui}/properties.json`,
   }

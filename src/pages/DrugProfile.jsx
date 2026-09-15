@@ -104,7 +104,7 @@ function MoaTab({ drug, status, label }) {
         : <>
           <p className="muted">No interactive graph available for this drug without the AI agent. Label mechanism text:</p>
           <Md text={data.labelSummary} />
-          {!status.agent?.configured && <p className="small muted">Set <code>CAVOTI_API_KEY</code> in <code>server/.env</code> to let Qwen generate an interactive diagram for any drug.</p>}
+          {!status.agent?.configured && <p className="small muted">Run the desktop version with a model key to let Qwen generate an interactive diagram for any drug.</p>}
         </>}
       <Citations items={data.citations || graph?.citations || label.citations} />
     </div>

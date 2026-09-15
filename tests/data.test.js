@@ -5,8 +5,8 @@ import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const mech = JSON.parse(readFileSync(path.join(__dirname, '../server/data/mechanisms.json'), 'utf8'))
-const cases = JSON.parse(readFileSync(path.join(__dirname, '../server/data/cases.json'), 'utf8'))
+const mech = JSON.parse(readFileSync(path.join(__dirname, '../shared/data/mechanisms.json'), 'utf8'))
+const cases = JSON.parse(readFileSync(path.join(__dirname, '../shared/data/cases.json'), 'utf8'))
 
 describe('mechanism graphs', () => {
   it('all edges reference existing node ids', () => {

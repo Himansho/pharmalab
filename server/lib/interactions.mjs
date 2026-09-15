@@ -1,88 +1,10 @@
-// server/lib/interactions.mjs — DDI pipeline:
-// RxNorm-normalized inputs -> openFDA label sections -> cross-reference mentions.
-// Pure scoring/extraction functions are exported separately for unit tests.
+// server/lib/interactions.mjs — server-side DDI orchestration.
+// Pure logic lives in shared/core.js (also bundled into the standalone app).
 import { labelByName } from './openfda.mjs'
 import { normalize } from './rxnorm.mjs'
-import { extractSnippets } from './util.mjs'
+import { nameVariants, crossReferenceMentions, dedupe, pairSeverity, labelUrl } from '../../shared/core.js'
 
-// Severity keyword rules (checked in order; first match wins).
-const SEVERITY_RULES = [
-  { severity: 'major', terms: ['contraindicated', 'contraindication', 'concomitant use of', 'should not be coadministered', 'not be administered with', 'avoid concurrent', 'avoid use with', 'life-threatening', 'fatal', 'rhabdomyolysis', 'bleeding', 'serotonin syndrome', 'QT prolongation', 'discontinue'] },
-  { severity: 'moderate', terms: ['monitor', 'caution', 'increased risk', 'potentiat', 'enhanced', 'additive', 'prolong', 'reduce the dose', 'dosage adjustment', 'clinically significant'] },
-  { severity: 'minor', terms: ['no interaction', 'not clinically', 'no clinically', 'well tolerated', 'pharmacokinetic interaction was not'] },
-]
-
-// Negated reassurance must beat the "clinically significant" moderate term.
-const NEGATED_REASSURANCE = /not\s+clinically\s+significant|no\s+clinically\s+significant|no\s+interaction|interaction\s+was\s+not|was\s+not\s+observed/i
-
-export function detectSeverity(text) {
-  if (!text) return 'unknown'
-  const lower = String(text).toLowerCase()
-  if (NEGATED_REASSURANCE.test(lower)) return 'minor'
-  for (const rule of SEVERITY_RULES) {
-    if (rule.terms.some((t) => lower.includes(t))) return rule.severity
-  }
-  return 'unknown'
-}
-
-// All name variants for a drug (lower-cased), from label + RxNorm.
-export function nameVariants(label, rxnorm) {
-  const set = new Set()
-  const add = (s) => { if (s && String(s).trim()) set.add(String(s).toLowerCase().trim()) }
-  if (label) {
-    add(label.genericName); add(label.substanceName)
-    ;(label.brandNames || []).forEach(add)
-    ;(label.activeIngredient || '').split(';').forEach(add)
-  }
-  if (rxnorm) {
-    add(rxnorm.rxnormName)
-    ;(rxnorm.genericNames || []).forEach(add)
-    ;(rxnorm.brandNames || []).forEach(add)
-  }
-  // Filter overly-generic single words
-  return [...set].filter((s) => s.length > 3)
-}
-
-// Given drug B's name variants, find sentences in drug A's relevant sections
-// that mention B (the "co-listed drugs or risk phrases" pipeline from the PRD).
-export function crossReferenceMentions(sourceLabel, otherVariants, { max = 4 } = {}) {
-  if (!sourceLabel) return []
-  const sections = (sourceLabel.sections || []).filter((s) =>
-    ['drug_interactions', 'contraindications', 'warnings_and_cautions', 'clinical_pharmacology'].includes(s.key))
-  const findings = []
-  for (const sec of sections) {
-    const snippets = extractSnippets(sec.text, otherVariants, { max })
-    for (const snip of snippets) {
-      findings.push({
-        section: sec.title,
-        sectionKey: sec.key,
-        snippet: snip,
-        severity: detectSeverity(snip),
-      })
-    }
-  }
-  return dedupe(findings)
-}
-
-export function dedupe(findings) {
-  const seen = new Set()
-  const out = []
-  for (const f of findings) {
-    const key = f.snippet.slice(0, 120).toLowerCase().replace(/[^a-z0-9]/g, '')
-    if (!seen.has(key)) { seen.add(key); out.push(f) }
-  }
-  return out.sort((a, b) => sevRank(a.severity) - sevRank(b.severity))
-}
-
-export function sevRank(s) {
-  return { major: 0, moderate: 1, unknown: 2, minor: 3 }[s] ?? 2
-}
-
-const RISK_ORDER = ['major', 'moderate', 'unknown', 'minor']
-export function pairSeverity(findings) {
-  if (!findings.length) return 'none-found'
-  return RISK_ORDER.find((r) => findings.some((f) => f.severity === r)) || 'unknown'
-}
+export { detectSeverity, nameVariants, crossReferenceMentions, dedupe, sevRank, pairSeverity } from '../../shared/core.js'
 
 // Orchestration: analyze every unordered pair among the given drug names.
 export async function analyzePairs(drugNames) {
@@ -99,7 +21,7 @@ export async function analyzePairs(drugNames) {
   for (let i = 0; i < resolved.length; i++) {
     for (let j = i + 1; j < resolved.length; j++) {
       const a = resolved[i], b = resolved[j]
-      const urlFor = (lbl) => (lbl ? `https://api.fda.gov/drug/label.json?search=${encodeURIComponent(`set_id:"${lbl.splId}"`)}&limit=1` : null)
+      const urlFor = (lbl) => (lbl ? labelUrl(lbl.splId) : null)
       const fromA = crossReferenceMentions(a.label, b.variants).map((f) => ({ ...f, foundIn: `${a.label?.genericName || a.name} label`, labelUrl: urlFor(a.label), splId: a.label?.splId || null }))
       const fromB = crossReferenceMentions(b.label, a.variants).map((f) => ({ ...f, foundIn: `${b.label?.genericName || b.name} label`, labelUrl: urlFor(b.label), splId: b.label?.splId || null }))
       const findings = dedupe([...fromA, ...fromB])

@@ -47,11 +47,13 @@ export default function Ask() {
 
       {busy && <p><Spinner label="Fetching label + FAERS + PubMed, then prompting Qwen…" /></p>}
       {err && <ErrorBox error={err} />}
-      {err?.code === 'AGENT_UNCONFIGURED' && (
+      {(err?.code === 'AGENT_UNCONFIGURED' || err?.code === 'SERVER_OFFLINE') && (
         <div className="card small">
-          <h2 style={{ margin: '0 0 8px' }}>🤖 AI features need one key</h2>
-          <p>Copy <code>server/.env.example</code> → <code>server/.env</code>, set <code>CAVOTI_API_KEY</code>, restart the server.
-            Everything else works meanwhile: <a href="#/search">drug search &amp; labels</a>, <a href="#/interactions">interaction checks</a>, <a href="#/literature">PubMed</a>, <a href="#/cases">clinical cases</a>.</p>
+          <h2 style={{ margin: '0 0 8px' }}>🤖 The AI agent lives in the desktop version</h2>
+          <p>On your PC run <code>npm run dev</code> and set <code>CAVOTI_API_KEY</code> in <code>server/.env</code>.
+            Everything else — <a href="#/search">drug search &amp; labels</a>, <a href="#/interactions">interaction checks</a>,
+            <a href="#/literature">PubMed</a>, <a href="#/charts">chart tools</a>, <a href="#/cases">clinical cases</a> —
+            works directly against FDA / NLM / NCBI, including in the phone app.</p>
         </div>
       )}
       {out && (

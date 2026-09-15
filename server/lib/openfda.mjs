@@ -1,24 +1,12 @@
 // server/lib/openfda.mjs — FDA label (SPL) + FAERS adverse event queries
-import { jsonFetch, cached, htmlToText } from './util.mjs'
+import { jsonFetch, cached, htmlToText, labelUrl } from './util.mjs'
+export { labelUrl }
 
 const BASE = 'https://api.fda.gov'
 const KEY = () => (process.env.OPENFDA_API_KEY ? `&api_key=${encodeURIComponent(process.env.OPENFDA_API_KEY)}` : '')
 
-// Sections to show on the drug profile, in display order.
-export const LABEL_SECTIONS = [
-  ['indications_and_usage', 'Indications & Usage'],
-  ['dosage_and_administration', 'Dosage & Administration'],
-  ['contraindications', 'Contraindications'],
-  ['warnings_and_cautions', 'Warnings & Cautions'],
-  ['drug_interactions', 'Drug Interactions'],
-  ['adverse_reactions', 'Adverse Reactions'],
-  ['clinical_pharmacology', 'Clinical Pharmacology (Mechanism & PK)'],
-  ['mechanism_of_action', 'Mechanism of Action'],
-  ['pharmacodynamics', 'Pharmacodynamics'],
-  ['pharmacokinetics', 'Pharmacokinetics'],
-  ['specific_populations', 'Use in Specific Populations'],
-  ['overdosage', 'Overdosage'],
-]
+export { LABEL_SECTIONS } from '../../shared/core.js'
+import { LABEL_SECTIONS } from '../../shared/core.js'
 
 const e = encodeURIComponent
 
@@ -49,10 +37,7 @@ export async function searchLabels(query, limit = 10) {
   return data
 }
 
-// Direct openFDA URL for a given SPL set id (citation-friendly).
-export function labelUrl(setId) {
-  return `${BASE}/drug/label.json?search=${e(`set_id:"${setId}"`)}&limit=1`
-}
+// labelUrl is exported from shared/core.js (re-exported via ./util.mjs).
 
 // Full label record for one SPL document (latest version returned by openFDA).
 export async function getLabel(splSetId) {

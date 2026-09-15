@@ -1,7 +1,10 @@
-// server/lib/util.mjs — env loading, fetching with timeout, TTL cache, text helpers
+// server/lib/util.mjs — env loading, fetching with timeout, TTL cache.
+// Text/evidence helpers now live in shared/core.js (shared with the standalone client).
 import { readFileSync, existsSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
+
+export { htmlToText, extractSnippets, labelUrl, DISCLAIMER, LABEL_SECTIONS } from '../../shared/core.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -47,43 +50,4 @@ export async function jsonFetch(url, { timeoutMs = 15000, ...opts } = {}) {
     if (e.name === 'AbortError') { const err = new Error('Upstream timed out'); err.status = 504; throw err }
     throw e
   } finally { clearTimeout(t) }
-}
-
-// openFDA returns HTML fragments in label sections — strip to readable text.
-export function htmlToText(html) {
-  if (!html) return ''
-  return String(html)
-    .replace(/<(.+?)>/g, ' ')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"').replace(/&#x27;|&#39;/g, "'")
-    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
-    .replace(/\s+/g, ' ')
-    .trim()
-}
-
-// Extract a sentence containing any of the given terms (evidence snippet).
-export function extractSnippets(text, terms, { radius = 260, max = 3 } = {}) {
-  if (!text || !terms.length) return []
-  const out = []
-  const lower = text.toLowerCase()
-  const seen = new Set()
-  for (const term of terms) {
-    const t = term.toLowerCase()
-    if (t.length < 4) continue
-    let idx = lower.indexOf(t)
-    while (idx !== -1 && out.length < max) {
-      const start = Math.max(0, idx - radius)
-      const end = Math.min(text.length, idx + t.length + radius)
-      // snap to sentence boundaries
-      let s = start, e = end
-      while (s > 0 && !/[.;:•]/.test(text[s - 1])) s--
-      while (e < text.length && !/[.;:•]/.test(text[e])) e++
-      const snip = text.slice(s, Math.min(e, text.length)).trim()
-      const key = snip.slice(0, 80).toLowerCase()
-      if (!seen.has(key)) { seen.add(key); out.push(snip) }
-      idx = lower.indexOf(t, idx + t.length)
-    }
-  }
-  return out
 }

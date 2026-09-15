@@ -42,12 +42,15 @@ including vision). Audit trail of AI calls: `logs/prompts.jsonl`.
 npm run build && npm start   # serves dist/ + API from :8787
 ```
 
-### Android client (APK)
-A tiny native WebView client lives in [`android/`](android) — it connects your phone to the
-PharmaLab server running on your PC (both on the same Wi-Fi).
-- **Download:** [PharmaLab-v1.0.0.apk](https://github.com/Himansho/pharmalab/releases/download/v1.0.0/PharmaLab-v1.0.0.apk) (debug-signed, 11 KB)
-- First launch asks for your server address, e.g. `http://192.168.1.20:8787` (find your PC's IP with `ipconfig`); the ⚙ badge reopens settings.
-- Rebuild: `cd android && .\gradlew.bat assembleDebug` (Android SDK required; toolchain: Gradle 9.1 + AGP 8.13)
+### Android client (APK) — fully standalone
+**One 1.3 MB APK contains the whole app.** No companion server, no pairing, no config:
+open it and PharmaLab runs, fetching drug data **directly** from openFDA / RxNorm /
+PubMed (all CORS-enabled public APIs) and using a bundled offline knowledge pack
+(mechanism graphs, clinical cases). Results cache locally for 24 h, so repeat lookups
+work even with flaky connectivity. Internet is only needed for fresh data.
+- **Download:** [PharmaLab-v1.0.0.apk](https://github.com/Himansho/pharmalab/releases/download/v1.0.0/PharmaLab-v1.0.0.apk) (debug-signed)
+- The AI agent screens (Ask / AI summaries / vision / case tutor) call the desktop server when reachable and otherwise explain themselves — all other features work 100% in-app.
+- Rebuild: `powershell android/build-apk.ps1` (runs vite build → stages assets → gradle assembleDebug)
 
 ### Tests & Docker
 ```bash

@@ -4,7 +4,6 @@
     <application
         android:label="PharmaLab"
         android:icon="@drawable/ic_launcher"
-        android:usesCleartextTraffic="true"
         android:theme="@android:style/Theme.Material.Light.NoActionBar">
         <activity
             android:name=".MainActivity"
